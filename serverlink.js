@@ -5,22 +5,36 @@ function playByLocationHash(){
     }
 }
 
+/* General has change logic */
+function changeHash(){
+    var id = $('#serverselector select').children(":selected").attr("id");
+    if(history.pushState) {
+        history.pushState(null, null, '#' + id);
+    }
+    else {
+        location.hash = '#' + id;
+    }
+}
+
 /* Change page hash by click on select */
-function changeHashOnSelect(){
-    $('#serverselector select').on('change', function() {
-        var id = $(this).children(":selected").attr("id");
-        if(history.pushState) {
-            history.pushState(null, null, '#' + id);
-        }
-        else {
-            location.hash = '#' + id;
-        }
+function changeHashOnSelect(selector){
+    $(selector).on('change', function() {
+        changeHash();
+    });
+}
+
+/* Change page hash by click on gamemode button */
+function changeHashOnClick(selector){
+    $(selector).on('click', function() {
+        changeHash();
     });
 }
 
 /*Switch playing server*/
 
 $( document ).ready(function() {
-    changeHashOnSelect();
+    console.log('!ready!');
+    changeHashOnSelect('#serverselector select');
+    changeHashOnClick('.btn-gamemode');
     playByLocationHash();
 });
