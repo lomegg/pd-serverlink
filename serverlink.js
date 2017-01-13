@@ -1,3 +1,14 @@
+/* Chec if page was reloaded */
+function runIfPageReloaded(callback){
+
+    if (window.performance && performance.navigation.type == 1) {
+        //console.info( "This page is reloaded" );
+    } else {
+        //console.info( "This page is not reloaded");
+        callback();
+    }
+}
+
 /* Start game on the server by location hash */
 function playByLocationHash(){
     if (window.location.hash.length){
@@ -6,13 +17,16 @@ function playByLocationHash(){
 }
 
 /* General has change logic */
-function changeHash(){
-    var id = $('#serverselector select').children(":selected").attr("id");
+function changeHash(hash){
+    if (!hash){
+        hash = $('#serverselector select').children(":selected").attr("id"); // get selected hash if not specified
+    }
+
     if(history.pushState) {
-        history.pushState(null, null, '#' + id);
+        history.pushState(null, null, '#' + hash);
     }
     else {
-        location.hash = '#' + id;
+        location.hash = '#' + hash;
     }
 }
 
@@ -23,10 +37,17 @@ function changeHashOnSelect(selector){
     });
 }
 
+
 /* Change page hash by click on gamemode button */
-function changeHashOnClick(selector){
-    $(selector).on('click', function() {
-        changeHash();
+function changeHashOnClick(selector, hash){
+    //var element = $(selector);
+    $(document).on("click", selector, function() {
+        var element = $(this);
+        if (element.attr('data-server')){
+            console.log(element.attr('data-server'));
+            hash = element.attr('data-server');
+        }
+        changeHash(hash);
     });
 }
 
@@ -36,5 +57,8 @@ $( document ).ready(function() {
     console.log('!ready!');
     changeHashOnSelect('#serverselector select');
     changeHashOnClick('.btn-gamemode');
-    playByLocationHash();
+    changeHashOnClick('#friends .switch-server');
+    runIfPageReloaded(function(){
+        playByLocationHash();
+    });
 });
