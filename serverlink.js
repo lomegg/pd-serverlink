@@ -1,4 +1,4 @@
-/* Chec if page was reloaded */
+/* Check if page was reloaded */
 function runIfPageNotReloaded(callback, fallback){
 
     if (window.performance && (performance.navigation.type == 1)) {
