@@ -63,15 +63,17 @@ function changeHashOnClick(selector, hash){
 window.selectServerInMenuByHash = function(){
     if (window.location.hash.length){
         var server = window.location.hash.substr(1);
-        $("#region option").remove();
-        $("#region").append(text);
-        $("#region").val("none");
-        var m = $('#region option[autorun="' + server + '"]').attr('MODE');
-        showonly(m);
-        $('#modeselector button').removeClass('btn-success');
-        $('button#' + m).attr("selected","selected").addClass('btn-success');
-        $('#serverselector select').children(":selected").removeAttr('selected');
-        $('#serverselector select option[id="' + server + '"]').attr("selected","selected");
+        checkIfServerPresent(server, function(){
+            $("#region option").remove();
+            $("#region").append(text);
+            $("#region").val("none");
+            var m = $('#region option[autorun="' + server + '"]').attr('MODE');
+            showonly(m);
+            $('#modeselector button').removeClass('btn-success');
+            $('button#' + m).attr("selected","selected").addClass('btn-success');
+            $('#serverselector select').children(":selected").removeAttr('selected');
+            $('#serverselector select option[id="' + server + '"]').attr("selected","selected");
+        });
 
     } else {
         console.warn('No server hash');
@@ -114,5 +116,6 @@ $( document ).ready(function() {
     }); */
 
     // Gentle run - select in menu and that's it
+    //
     selectServerInMenuByHash();
 });
