@@ -41,7 +41,7 @@ function changeHash(hash){
 
 /* Change page hash by click on select */
 function changeHashOnSelect(selector){
-    $(selector).on('change', function() {
+    $(document).on("change", selector, function(){
         changeHash();
     });
 }
@@ -60,20 +60,23 @@ function changeHashOnClick(selector, hash){
 }
 
 /*Set menu selector on a server*/
-function selectServerInMenuByHash(){
+window.selectServerInMenuByHash = function(){
     if (window.location.hash.length){
-        var server = window.location.hash;
+        var server = window.location.hash.substr(1);
         $("#region option").remove();
         $("#region").append(text);
         $("#region").val("none");
         var m = $('#region option[autorun="' + server + '"]').attr('MODE');
         showonly(m);
-        $('button#' + m).trigger("click").attr("selected","selected");
-        $('#region option[autorun="' + server + '"]').trigger("click").attr("selected","selected");
+        $('#modeselector button').removeClass('btn-success');
+        $('button#' + m).attr("selected","selected").addClass('btn-success');
+        $('#serverselector select').children(":selected").removeAttr('selected');
+        $('#serverselector select option[id="' + server + '"]').attr("selected","selected");
+
     } else {
         console.warn('No server hash');
     }
-}
+};
 
 /*Check if server option is present*/
 function checkIfServerPresent(server, callback){
