@@ -5,7 +5,7 @@ function runIfPageNotReloaded(callback, fallback){
         //console.info( "This page is reloaded" );
         fallback();
     } else {
-        //console.info( "This page is not reloaded");
+        //console.info( "This page is NOT reloaded");
         callback();
     }
 }
@@ -53,7 +53,6 @@ function changeHashOnClick(selector, hash){
     $(document).on("click", selector, function() {
         var element = $(this);
         if (element.attr('data-server')){
-            console.log(element.attr('data-server'));
             hash = element.attr('data-server');
         }
         changeHash(hash);
@@ -98,7 +97,6 @@ function checkIfServerPresent(server, callback){
 
 
 $( document ).ready(function() {
-    console.log('!ready!');
     changeHashOnSelect('#serverselector select');
     changeHashOnClick('.btn-gamemode');
     changeHashOnClick('#friends .switch-server');
