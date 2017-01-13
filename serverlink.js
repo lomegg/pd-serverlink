@@ -1,8 +1,9 @@
 /* Chec if page was reloaded */
-function runIfPageReloaded(callback){
+function runIfPageNotReloaded(callback, fallback){
 
-    if (window.performance && performance.navigation.type == 1) {
+    if (window.performance && (performance.navigation.type == 1)) {
         //console.info( "This page is reloaded" );
+        fallback();
     } else {
         //console.info( "This page is not reloaded");
         callback();
@@ -12,7 +13,14 @@ function runIfPageReloaded(callback){
 /* Start game on the server by location hash */
 function playByLocationHash(){
     if (window.location.hash.length){
-        switchPlayingServer(window.location.hash.substr(1));
+
+        var server = window.location.hash.substr(1);
+
+        checkIfServerPresent(server, function(){
+            switchPlayingServer(server);
+        });
+    } else {
+        console.warn('No server hash');
     }
 }
 
@@ -21,12 +29,13 @@ function changeHash(hash){
     if (!hash){
         hash = $('#serverselector select').children(":selected").attr("id"); // get selected hash if not specified
     }
-
-    if(history.pushState) {
-        history.pushState(null, null, '#' + hash);
-    }
-    else {
-        location.hash = '#' + hash;
+    if (window.location.hash !== ('#' + hash)){
+        if(history.pushState) {
+            history.pushState(null, null, '#' + hash);
+        }
+        else {
+            location.hash = '#' + hash;
+        }
     }
 }
 
@@ -51,14 +60,58 @@ function changeHashOnClick(selector, hash){
     });
 }
 
-/*Switch playing server*/
+/*Set menu selector on a server*/
+function selectServerInMenuByHash(){
+    if (window.location.hash.length){
+        var server = window.location.hash;
+        $("#region option").remove();
+        $("#region").append(text);
+        $("#region").val("none");
+        var m = $('#region option[autorun="' + server + '"]').attr('MODE');
+        showonly(m);
+        $('button#' + m).trigger("click").attr("selected","selected");
+        $('#region option[autorun="' + server + '"]').trigger("click").attr("selected","selected");
+    } else {
+        console.warn('No server hash');
+    }
+}
+
+/*Check if server option is present*/
+function checkIfServerPresent(server, callback){
+    $('body').append('<select id="tmp-cont" style="display:none;"></select>');
+    //$("#region option").remove();
+    $("#tmp-cont").append(text);
+
+    if ($('#tmp-cont option[id="' + server + '"]').length){
+        $("#tmp-cont").remove();
+        if (callback){
+            callback(server);
+        } else {
+            return true;
+        }
+    } else {
+        $("#tmp-cont").remove();
+        console.warn('Hash contains server name that is not exists');
+        return false;
+    }
+}
+
 
 $( document ).ready(function() {
     console.log('!ready!');
     changeHashOnSelect('#serverselector select');
     changeHashOnClick('.btn-gamemode');
     changeHashOnClick('#friends .switch-server');
-    runIfPageReloaded(function(){
+
+    // Hybrid run - if page was reloaded, show server in menu; if opened fresh, launch server
+    /*runIfPageNotReloaded(function(){
+        console.log('callback');
         playByLocationHash();
-    });
+    }, function(){
+        console.log('fallback');
+        selectServerInMenuByHash();
+    }); */
+
+    // Gentle run - select in menu and that's it
+    selectServerInMenuByHash();
 });
