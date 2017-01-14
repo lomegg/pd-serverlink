@@ -39,23 +39,21 @@ function changeHash(hash){
     }
 }
 
-/* Change page hash by click on select */
-function changeHashOnSelect(selector){
-    $(document).on("change", selector, function(){
-        changeHash();
-    });
-}
-
 
 /* Change page hash by click on gamemode button */
 function changeHashOnClick(selector, hash){
     //var element = $(selector);
-    $(document).on("click", selector, function() {
+    $(document).on("click", selector, function(e) {
         var element = $(this);
-        if (element.attr('data-server')){
-            hash = element.attr('data-server');
+        if (e.originalEvent !== undefined){
+            // script was triggered by human
+            if (element.attr('data-server')){
+                hash = element.attr('data-server');
+            }
+            changeHash(hash);
+        } else {
+            // script was triggered by script, no need to process
         }
-        changeHash(hash);
     });
 }
 
@@ -102,7 +100,7 @@ function checkIfServerPresent(server, callback){
 
 
 $( document ).ready(function() {
-    changeHashOnSelect('#serverselector select');
+    changeHashOnClick('#serverselector option');
     changeHashOnClick('.btn-gamemode');
     changeHashOnClick('#friends .switch-server');
 
